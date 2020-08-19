@@ -24,5 +24,4 @@
             android:layout_alignParentTop="true"/>
     </com.example.blinkmeasure.CameraSourcePreview>
 
-
 </RelativeLayout>
