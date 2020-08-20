@@ -105,7 +105,7 @@ public class FaceGraphic extends Graphic {
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getBoundingBox().centerX());
         float y = translateY(face.getBoundingBox().centerY());
-        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
+        //canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
 
         // Calculate positions.
         float left = x - scale(face.getBoundingBox().width() / 2.0f);
@@ -149,15 +149,30 @@ public class FaceGraphic extends Graphic {
                 idPaints[colorID]);
         yLabelOffset += lineHeight;
 
-        // Draws all face contours: 얼굴 landmark 특징점 표시
-        for (FaceContour contour : face.getAllContours()) {
-            Log.i("FaceGraphic.java", "left eye points: "+face.getContour(FaceContour.LEFT_EYE).getPoints());
-            Log.i("FaceGraphic.java", "right eye points: "+face.getContour(FaceContour.RIGHT_EYE).getPoints());
-            for (PointF point : contour.getPoints()) {
-                canvas.drawCircle(
-                        translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
-            }
+//        // Draws all face contours: 얼굴 landmark 특징점 표시
+//        for (FaceContour contour : face.getAllContours()) {
+//            Log.i("FaceGraphic.java", "left eye points: "+face.getContour(FaceContour.LEFT_EYE).getPoints());
+//            Log.i("FaceGraphic.java", "right eye points: "+face.getContour(FaceContour.RIGHT_EYE).getPoints());
+//            for (PointF point : contour.getPoints()) {
+//                canvas.drawCircle(
+//                        translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
+//            }
+//        }
+
+        Log.i("FaceGraphic.java", "left eye points: "+face.getContour(FaceContour.LEFT_EYE).getPoints());
+        Log.i("FaceGraphic.java", "right eye points: "+face.getContour(FaceContour.RIGHT_EYE).getPoints());
+        // left eye 특징점 표시
+        for (PointF point : face.getContour(FaceContour.LEFT_EYE).getPoints()) {
+            canvas.drawCircle(
+                    translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
         }
+
+        // right eye 특징점 표시
+        for (PointF point : face.getContour(FaceContour.RIGHT_EYE).getPoints()) {
+            canvas.drawCircle(
+                    translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
+        }
+
 
 //        // Draws smiling and left/right eye open probabilities.
 //        if (face.getSmilingProbability() != null) {
