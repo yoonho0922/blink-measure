@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.util.Log;
 
 import com.example.blinkmeasure.GraphicOverlay;
 import com.example.blinkmeasure.GraphicOverlay.Graphic;
@@ -136,7 +137,7 @@ public class FaceGraphic extends Graphic {
                     String.format(Locale.US, "Right eye: %.2f", face.getLeftEyeOpenProbability())));
         }
 
-        // Draw labels
+        // Draw labels : 얼굴 bouding box
         canvas.drawRect(left - BOX_STROKE_WIDTH,
                 top + yLabelOffset,
                 left + textWidth + (2 * BOX_STROKE_WIDTH),
@@ -148,84 +149,87 @@ public class FaceGraphic extends Graphic {
                 idPaints[colorID]);
         yLabelOffset += lineHeight;
 
-        // Draws all face contours.
+        // Draws all face contours: 얼굴 landmark 특징점 표시
         for (FaceContour contour : face.getAllContours()) {
+            Log.i("FaceGraphic.java", "left eye points: "+face.getContour(FaceContour.LEFT_EYE).getPoints());
+            Log.i("FaceGraphic.java", "right eye points: "+face.getContour(FaceContour.RIGHT_EYE).getPoints());
             for (PointF point : contour.getPoints()) {
                 canvas.drawCircle(
                         translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
             }
         }
 
-        // Draws smiling and left/right eye open probabilities.
-        if (face.getSmilingProbability() != null) {
-            canvas.drawText(
-                    "Smiling: " + String.format(Locale.US, "%.2f", face.getSmilingProbability()),
-                    left,
-                    top + yLabelOffset,
-                    idPaints[colorID]);
-            yLabelOffset += lineHeight;
-        }
-
-        FaceLandmark leftEye = face.getLandmark(FaceLandmark.LEFT_EYE);
-        if (leftEye != null && face.getLeftEyeOpenProbability() != null) {
-            canvas.drawText(
-                    "Left eye open: " + String.format(Locale.US, "%.2f", face.getLeftEyeOpenProbability()),
-                    translateX(leftEye.getPosition().x) + ID_X_OFFSET,
-                    translateY(leftEye.getPosition().y) + ID_Y_OFFSET,
-                    idPaints[colorID]);
-        } else if (leftEye != null && face.getLeftEyeOpenProbability() == null) {
-            canvas.drawText(
-                    "Left eye",
-                    left,
-                    top + yLabelOffset,
-                    idPaints[colorID]);
-            yLabelOffset += lineHeight;
-        } else if (leftEye == null && face.getLeftEyeOpenProbability() != null) {
-            canvas.drawText(
-                    "Left eye open: " + String.format(Locale.US, "%.2f", face.getLeftEyeOpenProbability()),
-                    left,
-                    top + yLabelOffset,
-                    idPaints[colorID]);
-            yLabelOffset += lineHeight;
-        }
-
-        FaceLandmark rightEye = face.getLandmark(FaceLandmark.RIGHT_EYE);
-        if (rightEye != null && face.getRightEyeOpenProbability() != null) {
-            canvas.drawText(
-                    "Right eye open: " + String.format(Locale.US, "%.2f", face.getRightEyeOpenProbability()),
-                    translateX(rightEye.getPosition().x) + ID_X_OFFSET,
-                    translateY(rightEye.getPosition().y) + ID_Y_OFFSET,
-                    idPaints[colorID]);
-        } else if (rightEye != null && face.getRightEyeOpenProbability() == null) {
-            canvas.drawText(
-                    "Right eye",
-                    left,
-                    top + yLabelOffset,
-                    idPaints[colorID]);
-            yLabelOffset += lineHeight;
-        } else if (rightEye == null && face.getRightEyeOpenProbability() != null) {
-            canvas.drawText(
-                    "Right eye open: " + String.format(Locale.US, "%.2f", face.getRightEyeOpenProbability()),
-                    left,
-                    top + yLabelOffset,
-                    idPaints[colorID]);
-        }
+//        // Draws smiling and left/right eye open probabilities.
+//        if (face.getSmilingProbability() != null) {
+//            canvas.drawText(
+//                    "Smiling: " + String.format(Locale.US, "%.2f", face.getSmilingProbability()),
+//                    left,
+//                    top + yLabelOffset,
+//                    idPaints[colorID]);
+//            yLabelOffset += lineHeight;
+//        }
+//
+//        FaceLandmark leftEye = face.getLandmark(FaceLandmark.LEFT_EYE);
+//        if (leftEye != null && face.getLeftEyeOpenProbability() != null) {
+//            canvas.drawText(
+//                    "Left eye open: " + String.format(Locale.US, "%.2f", face.getLeftEyeOpenProbability()),
+//                    translateX(leftEye.getPosition().x) + ID_X_OFFSET,
+//                    translateY(leftEye.getPosition().y) + ID_Y_OFFSET,
+//                    idPaints[colorID]);
+//        } else if (leftEye != null && face.getLeftEyeOpenProbability() == null) {
+//            canvas.drawText(
+//                    "Left eye",
+//                    left,
+//                    top + yLabelOffset,
+//                    idPaints[colorID]);
+//            yLabelOffset += lineHeight;
+//        } else if (leftEye == null && face.getLeftEyeOpenProbability() != null) {
+//            canvas.drawText(
+//                    "Left eye open: " + String.format(Locale.US, "%.2f", face.getLeftEyeOpenProbability()),
+//                    left,
+//                    top + yLabelOffset,
+//                    idPaints[colorID]);
+//            yLabelOffset += lineHeight;
+//        }
+//
+//        FaceLandmark rightEye = face.getLandmark(FaceLandmark.RIGHT_EYE);
+//        if (rightEye != null && face.getRightEyeOpenProbability() != null) {
+//            canvas.drawText(
+//                    "Right eye open: " + String.format(Locale.US, "%.2f", face.getRightEyeOpenProbability()),
+//                    translateX(rightEye.getPosition().x) + ID_X_OFFSET,
+//                    translateY(rightEye.getPosition().y) + ID_Y_OFFSET,
+//                    idPaints[colorID]);
+//        } else if (rightEye != null && face.getRightEyeOpenProbability() == null) {
+//            canvas.drawText(
+//                    "Right eye",
+//                    left,
+//                    top + yLabelOffset,
+//                    idPaints[colorID]);
+//            yLabelOffset += lineHeight;
+//        } else if (rightEye == null && face.getRightEyeOpenProbability() != null) {
+//            canvas.drawText(
+//                    "Right eye open: " + String.format(Locale.US, "%.2f", face.getRightEyeOpenProbability()),
+//                    left,
+//                    top + yLabelOffset,
+//                    idPaints[colorID]);
+//        }
 
         // Draw facial landmarks
-        drawFaceLandmark(canvas, FaceLandmark.LEFT_EYE);
-        drawFaceLandmark(canvas, FaceLandmark.RIGHT_EYE);
-        drawFaceLandmark(canvas, FaceLandmark.LEFT_CHEEK);
-        drawFaceLandmark(canvas, FaceLandmark.RIGHT_CHEEK);
+//        drawFaceLandmark(canvas, FaceLandmark.LEFT_EYE);
+//        drawFaceLandmark(canvas, FaceLandmark.RIGHT_EYE);
+//        drawFaceLandmark(canvas, FaceLandmark.LEFT_CHEEK);
+//        drawFaceLandmark(canvas, FaceLandmark.RIGHT_CHEEK);
     }
 
     private void drawFaceLandmark(Canvas canvas, @LandmarkType int landmarkType) {
         FaceLandmark faceLandmark = face.getLandmark(landmarkType);
         if (faceLandmark != null) {
-            canvas.drawCircle(
-                    translateX(faceLandmark.getPosition().x),
-                    translateY(faceLandmark.getPosition().y),
-                    FACE_POSITION_RADIUS,
-                    facePositionPaint);
+//            Log.d("FaceGraphic.java", "랜드마크 null 아님");
+//            canvas.drawCircle(
+//                    translateX(faceLandmark.getPosition().x),
+//                    translateY(faceLandmark.getPosition().y),
+//                    FACE_POSITION_RADIUS,
+//                    facePositionPaint);
         }
     }
 }
