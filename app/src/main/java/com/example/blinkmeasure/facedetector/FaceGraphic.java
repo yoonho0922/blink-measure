@@ -29,7 +29,9 @@ import com.google.mlkit.vision.face.FaceContour;
 import com.google.mlkit.vision.face.FaceLandmark;
 import com.google.mlkit.vision.face.FaceLandmark.LandmarkType;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Graphic instance for rendering face position, contour, and landmarks within the associated
@@ -63,9 +65,10 @@ public class FaceGraphic extends Graphic {
 
     private volatile Face face;
 
+
     FaceGraphic(GraphicOverlay overlay, Face face) {
         super(overlay);
-
+        Log.d("FaceGraphic", "FG생성");
         this.face = face;
         final int selectedColor = Color.WHITE;
 
@@ -149,91 +152,52 @@ public class FaceGraphic extends Graphic {
                 idPaints[colorID]);
         yLabelOffset += lineHeight;
 
-//        // Draws all face contours: 얼굴 landmark 특징점 표시
-//        for (FaceContour contour : face.getAllContours()) {
-//            Log.i("FaceGraphic.java", "left eye points: "+face.getContour(FaceContour.LEFT_EYE).getPoints());
-//            Log.i("FaceGraphic.java", "right eye points: "+face.getContour(FaceContour.RIGHT_EYE).getPoints());
-//            for (PointF point : contour.getPoints()) {
-//                canvas.drawCircle(
-//                        translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
-//            }
-//        }
+        List<PointF> LEpoints = face.getContour(FaceContour.LEFT_EYE).getPoints();
+        List<PointF> REpoints = face.getContour(FaceContour.RIGHT_EYE).getPoints();
+        //Log.i("FaceGraphic.java", "left eye points: " + LEpoints);
+        //Log.i("FaceGraphic.java", "right eye points: " + REpoints);
+//        Log.i("FaceGraphic.java", "left EAR: " + getEAR(LEpoints));
+//        Log.i("FaceGraphic.java", "right EAR: " + getEAR(REpoints));
 
-        Log.i("FaceGraphic.java", "left eye points: "+face.getContour(FaceContour.LEFT_EYE).getPoints());
-        Log.i("FaceGraphic.java", "right eye points: "+face.getContour(FaceContour.RIGHT_EYE).getPoints());
+
+
+
+
+
         // left eye 특징점 표시
+        int i = 0;
         for (PointF point : face.getContour(FaceContour.LEFT_EYE).getPoints()) {
-            canvas.drawCircle(
-                    translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
+            if(i%2==0) {
+                Log.i("LEpoint", i+", "+point.toString());
+                canvas.drawCircle(
+                        translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
+            }
+            i++;
         }
-
+        i=0;
         // right eye 특징점 표시
         for (PointF point : face.getContour(FaceContour.RIGHT_EYE).getPoints()) {
-            canvas.drawCircle(
-                    translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
+            if(i%2==0) {
+                Log.i("REpoint", i+", "+point.toString());
+                canvas.drawCircle(
+                        translateX(point.x), translateY(point.y), FACE_POSITION_RADIUS, facePositionPaint);
+            }
+            i++;
         }
+        i=0;
 
 
-//        // Draws smiling and left/right eye open probabilities.
-//        if (face.getSmilingProbability() != null) {
-//            canvas.drawText(
-//                    "Smiling: " + String.format(Locale.US, "%.2f", face.getSmilingProbability()),
-//                    left,
-//                    top + yLabelOffset,
-//                    idPaints[colorID]);
-//            yLabelOffset += lineHeight;
-//        }
-//
-//        FaceLandmark leftEye = face.getLandmark(FaceLandmark.LEFT_EYE);
-//        if (leftEye != null && face.getLeftEyeOpenProbability() != null) {
-//            canvas.drawText(
-//                    "Left eye open: " + String.format(Locale.US, "%.2f", face.getLeftEyeOpenProbability()),
-//                    translateX(leftEye.getPosition().x) + ID_X_OFFSET,
-//                    translateY(leftEye.getPosition().y) + ID_Y_OFFSET,
-//                    idPaints[colorID]);
-//        } else if (leftEye != null && face.getLeftEyeOpenProbability() == null) {
-//            canvas.drawText(
-//                    "Left eye",
-//                    left,
-//                    top + yLabelOffset,
-//                    idPaints[colorID]);
-//            yLabelOffset += lineHeight;
-//        } else if (leftEye == null && face.getLeftEyeOpenProbability() != null) {
-//            canvas.drawText(
-//                    "Left eye open: " + String.format(Locale.US, "%.2f", face.getLeftEyeOpenProbability()),
-//                    left,
-//                    top + yLabelOffset,
-//                    idPaints[colorID]);
-//            yLabelOffset += lineHeight;
-//        }
-//
-//        FaceLandmark rightEye = face.getLandmark(FaceLandmark.RIGHT_EYE);
-//        if (rightEye != null && face.getRightEyeOpenProbability() != null) {
-//            canvas.drawText(
-//                    "Right eye open: " + String.format(Locale.US, "%.2f", face.getRightEyeOpenProbability()),
-//                    translateX(rightEye.getPosition().x) + ID_X_OFFSET,
-//                    translateY(rightEye.getPosition().y) + ID_Y_OFFSET,
-//                    idPaints[colorID]);
-//        } else if (rightEye != null && face.getRightEyeOpenProbability() == null) {
-//            canvas.drawText(
-//                    "Right eye",
-//                    left,
-//                    top + yLabelOffset,
-//                    idPaints[colorID]);
-//            yLabelOffset += lineHeight;
-//        } else if (rightEye == null && face.getRightEyeOpenProbability() != null) {
-//            canvas.drawText(
-//                    "Right eye open: " + String.format(Locale.US, "%.2f", face.getRightEyeOpenProbability()),
-//                    left,
-//                    top + yLabelOffset,
-//                    idPaints[colorID]);
-//        }
+    }//Eof FaceGraphic constructor
 
-        // Draw facial landmarks
-//        drawFaceLandmark(canvas, FaceLandmark.LEFT_EYE);
-//        drawFaceLandmark(canvas, FaceLandmark.RIGHT_EYE);
-//        drawFaceLandmark(canvas, FaceLandmark.LEFT_CHEEK);
-//        drawFaceLandmark(canvas, FaceLandmark.RIGHT_CHEEK);
+    private double getEAR(List<PointF> points){
+        return (getDistance(points.get(14), points.get(2))
+                +getDistance(points.get(12), points.get(4))
+                +getDistance(points.get(10), points.get(6)))
+                    /3/getDistance(points.get(8), points.get(0));
+    }
+
+    private double getDistance(PointF a, PointF b){
+        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
     private void drawFaceLandmark(Canvas canvas, @LandmarkType int landmarkType) {
