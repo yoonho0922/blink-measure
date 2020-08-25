@@ -8,10 +8,16 @@
     android:keepScreenOn="true"
     android:orientation="vertical">
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"/>
+
     <com.example.blinkmeasure.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="1dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true">
 

@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.core.app.ActivityCompat;
@@ -40,6 +41,11 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.mlkit.common.model.LocalModel;
 import com.example.blinkmeasure.facedetector.FaceDetectorProcessor;
@@ -84,6 +90,8 @@ public final class MainActivity extends AppCompatActivity {
             Log.d(TAG, "getRuntimePermission, pg: " + allPermissionsGranted());
             getRuntimePermissions();
         }
+
+        setChart();
     }//Eof onCreate
 
     private void createCameraSource(String model) {
@@ -135,7 +143,32 @@ public final class MainActivity extends AppCompatActivity {
         startCameraSource();
     }
 
-    //about permission granted
+    // about chart
+    private void setChart() {
+
+        LineChart chart;
+
+        chart = findViewById(R.id.lineChart);
+        ArrayList<Entry> values = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            float val = (float) (Math.random() * 10);
+            values.add(new Entry(i, val));
+        }
+        LineDataSet set1;
+        set1 = new LineDataSet(values, "DataSet 1");
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(set1); // add the data sets
+        // create a data object with the data sets
+        LineData data = new LineData(dataSets);
+        // black lines and points
+        set1.setColor(Color.BLACK);
+        set1.setCircleColor(Color.BLACK);
+        // set data
+        chart.setData(data);
+    }
+
+
+    // about permission granted
 
     private String[] getRequiredPermissions() {
         try {
