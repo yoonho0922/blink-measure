@@ -20,11 +20,13 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.util.Log;
 
+import com.example.blinkmeasure.blink.BlinkDetector;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.example.blinkmeasure.GraphicOverlay;
 import com.example.blinkmeasure.VisionProcessorBase;
 import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceContour;
 import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
@@ -43,6 +45,7 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
     private static final String TAG = "FaceDetectorProcessor";
 
     private final FaceDetector detector;
+    private BlinkDetector bd = new BlinkDetector();
 
     public FaceDetectorProcessor(Context context) {
         this(
@@ -74,8 +77,22 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
     protected void onSuccess(@NonNull List<Face> faces, @NonNull GraphicOverlay graphicOverlay) {
         for (Face face : faces) {
             graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
-            logExtrasForTesting(face);
+            List<PointF> LEpoints = face.getContour(FaceContour.LEFT_EYE).getPoints();
+            List<PointF> REpoints = face.getContour(FaceContour.RIGHT_EYE).getPoints();
+            double EAR = (getEAR(LEpoints) + getEAR(REpoints))/2;
+            bd.detect(EAR);
         }
+    }
+
+    private double getEAR(List<PointF> points){
+        return (getDistance(points.get(14), points.get(2))
+                +getDistance(points.get(12), points.get(4))
+                +getDistance(points.get(10), points.get(6)))
+                /3/getDistance(points.get(8), points.get(0));
+    }
+
+    private double getDistance(PointF a, PointF b){
+        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
     private static void logExtrasForTesting(Face face) {
