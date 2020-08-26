@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="RtlHardcoded"
     android:layout_width="match_parent"
@@ -8,16 +8,10 @@
     android:keepScreenOn="true"
     android:orientation="vertical">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lineChart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FFFFFF"/>
-
     <com.example.blinkmeasure.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="500dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true">
 
@@ -30,4 +24,9 @@
             android:layout_alignParentTop="true"/>
     </com.example.blinkmeasure.CameraSourcePreview>
 
-</RelativeLayout>
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"/>
+</LinearLayout>

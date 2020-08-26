@@ -42,10 +42,13 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.mlkit.common.model.LocalModel;
 import com.example.blinkmeasure.facedetector.FaceDetectorProcessor;
@@ -73,6 +76,8 @@ public final class MainActivity extends AppCompatActivity {
     private CameraSource cameraSource = null;
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
+    private LineChart chart;
+    private Thread thread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,7 @@ public final class MainActivity extends AppCompatActivity {
 
         preview = findViewById(R.id.preview);
         graphicOverlay = findViewById(R.id.graphic_overlay);
+        chart = findViewById(R.id.lineChart);
 
         if (allPermissionsGranted()) {
             Log.d(TAG, "createCameraSource, pg: " + allPermissionsGranted());
@@ -90,8 +96,6 @@ public final class MainActivity extends AppCompatActivity {
             Log.d(TAG, "getRuntimePermission, pg: " + allPermissionsGranted());
             getRuntimePermissions();
         }
-
-        setChart();
     }//Eof onCreate
 
     private void createCameraSource(String model) {
@@ -105,8 +109,9 @@ public final class MainActivity extends AppCompatActivity {
             Log.i(TAG, "Using Face Detector Processor");
             FaceDetectorOptions faceDetectorOptions =
                     PreferenceUtils.getFaceDetectorOptionsForLivePreview(this);
-            cameraSource.setMachineLearningFrameProcessor(
-                    new FaceDetectorProcessor(this, faceDetectorOptions));
+            FaceDetectorProcessor fdp =
+                    new FaceDetectorProcessor(this, faceDetectorOptions);
+            cameraSource.setMachineLearningFrameProcessor(fdp);
         } catch (Exception e) {
             Log.e(TAG, "Can not create image processor: " + model, e);
             Toast.makeText(
@@ -126,7 +131,9 @@ public final class MainActivity extends AppCompatActivity {
                 if (graphicOverlay == null) {
                     Log.d(TAG, "resume: graphOverlay is null");
                 }
-                preview.start(cameraSource, graphicOverlay);
+                Log.d(TAG, "onResume2");
+                preview.start(cameraSource, graphicOverlay, chart);
+                Log.d(TAG, "onResume4");
             } catch (IOException e) {
                 Log.e(TAG, "Unable to start camera source.", e);
                 cameraSource.release();
@@ -144,29 +151,90 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     // about chart
-    private void setChart() {
 
-        LineChart chart;
-
-        chart = findViewById(R.id.lineChart);
-        ArrayList<Entry> values = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            float val = (float) (Math.random() * 10);
-            values.add(new Entry(i, val));
-        }
-        LineDataSet set1;
-        set1 = new LineDataSet(values, "DataSet 1");
-        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(set1); // add the data sets
-        // create a data object with the data sets
-        LineData data = new LineData(dataSets);
-        // black lines and points
-        set1.setColor(Color.BLACK);
-        set1.setCircleColor(Color.BLACK);
-        // set data
-        chart.setData(data);
-    }
-
+//    private void setChart() {
+//
+//
+//
+//
+//        XAxis xAxis = chart.getXAxis();
+//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+//        xAxis.setTextSize(10f);
+//        xAxis.setDrawGridLines(false);
+//
+//        YAxis leftAxis = chart.getAxisLeft();
+//        leftAxis.setDrawGridLines(false);
+//
+//        YAxis rightAxis = chart.getAxisRight();
+//        rightAxis.setEnabled(false);
+//
+//        LineData data = new LineData();
+//        chart.setData(data);
+//
+//        feedMultiple();
+//    }
+//
+//    private void feedMultiple(){
+//        if(thread != null)
+//            thread.interrupt();
+//
+//        final Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                addEntry();
+//            }
+//        };
+//
+//        thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while(true){
+//                    runOnUiThread(runnable);
+//                    try{
+//                        Thread.sleep(100);
+//                    }catch(InterruptedException ie){
+//                        ie.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
+//        thread.start();
+//    }
+//
+//    private void addEntry(){
+//        LineData data = chart.getData();
+//        if(data != null){
+//            ILineDataSet set = data.getDataSetByIndex(0);
+//
+//            if(set == null){
+//                set = createSet();
+//                data.addDataSet(set);
+//            }
+//
+//            data.addEntry(new Entry(set.getEntryCount(), (float)(Math.random()*40)+30f), 0);
+//            data.notifyDataChanged();
+//
+//            chart.notifyDataSetChanged();
+//            chart.setVisibleXRangeMinimum(10);
+//            chart.moveViewToX(data.getEntryCount());
+//        }
+//    }
+//
+//    private LineDataSet createSet(){
+//
+//        LineDataSet set = new LineDataSet(null, "Dynamic Data");
+//        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+//        set.setColor(ColorTemplate.getHoloBlue());
+//        set.setCircleColor(Color.WHITE);
+//        set.setLineWidth(2f);
+//        set.setCircleRadius(4f);
+//        set.setFillAlpha(65);
+//        set.setFillColor(ColorTemplate.getHoloBlue());
+//        set.setHighLightColor(Color.rgb(244,117,117));
+//        set.setDrawValues(false);
+//        return set;
+//    }
+//
 
     // about permission granted
 

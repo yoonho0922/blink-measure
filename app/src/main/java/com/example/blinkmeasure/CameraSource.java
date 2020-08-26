@@ -20,6 +20,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -29,6 +30,15 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
+import com.example.blinkmeasure.facedetector.FaceDetectorProcessor;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.common.images.Size;
 import com.example.blinkmeasure.preference.PreferenceUtils;
 
@@ -42,13 +52,14 @@ import java.util.Map;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Manages the camera and allows UI updates on top of it (e.g. overlaying extra Graphics or
  * displaying extra information). This receives preview frames from the camera at a specified rate,
  * sending those frames to child classes' detectors / classifiers as fast as it is able to process.
  */
-public class CameraSource {
+public class CameraSource extends AppCompatActivity {
     @SuppressLint("InlinedApi")
     public static final int CAMERA_FACING_BACK = CameraInfo.CAMERA_FACING_BACK;
 
@@ -114,7 +125,8 @@ public class CameraSource {
     private final Object processorLock = new Object();
     // TODO(b/74400062) Re-enable the annotaion
     // @GuardedBy("processorLock")
-    private VisionImageProcessor frameProcessor;
+    public FaceDetectorProcessor frameProcessor;
+    public LineChart chart;
 
     /**
      * Map to convert between a byte array, received from the camera, and its associated byte buffer.
@@ -160,7 +172,9 @@ public class CameraSource {
      * @throws IOException if the camera's preview texture or display could not be initialized
      */
     @RequiresPermission(Manifest.permission.CAMERA)
-    public synchronized CameraSource start() throws IOException {
+    public synchronized CameraSource start(LineChart chart, int i) throws IOException {
+        this.chart = chart;
+        setChart();
         if (camera != null) {
             return this;
         }
@@ -202,15 +216,7 @@ public class CameraSource {
         return this;
     }
 
-    /**
-     * Closes the camera and stops sending frames to the underlying frame detector.
-     *
-     * <p>This camera source may be restarted again by calling {@link #start()} or {@link
-     * #start(SurfaceHolder)}.
-     *
-     * <p>Call {@link #release()} instead to completely shut down this camera source and release the
-     * resources of the underlying detector.
-     */
+
     public synchronized void stop() {
         processingRunnable.setActive(false);
         if (processingThread != null) {
@@ -595,7 +601,7 @@ public class CameraSource {
         }
     }
 
-    public void setMachineLearningFrameProcessor(VisionImageProcessor processor) {
+    public void setMachineLearningFrameProcessor(FaceDetectorProcessor processor) {
         synchronized (processorLock) {
             cleanScreen();
             if (frameProcessor != null) {
@@ -691,7 +697,6 @@ public class CameraSource {
         @Override
         public void run() {
             ByteBuffer data;
-
             while (true) {
                 synchronized (lock) {
                     while (active && (pendingFrameData == null)) {
@@ -726,6 +731,15 @@ public class CameraSource {
 
                 try {
                     synchronized (processorLock) {
+                        Log.d(TAG, "onResume4.1, " + frameProcessor.EAR);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                addEntry(frameProcessor.EAR);
+                            }
+                        });
+
                         frameProcessor.processByteBuffer(
                                 data,
                                 new FrameMetadata.Builder()
@@ -742,6 +756,64 @@ public class CameraSource {
                 }
             }
         }
+
+//        final Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                addEntry(chart, EAR);
+//            }
+//        };
+    }
+
+    public void setChart(){
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextSize(10f);
+        xAxis.setDrawGridLines(false);
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setDrawGridLines(false);
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setEnabled(false);
+
+        LineData data = new LineData();
+        chart.setData(data);
+    }
+
+    public void addEntry(double EAR){
+
+        LineData data = chart.getData();
+        if(data != null){
+            ILineDataSet set = data.getDataSetByIndex(0);
+
+            if(set == null){
+                set = createSet(chart);
+                data.addDataSet(set);
+            }
+
+            data.addEntry(new Entry(set.getEntryCount(), (float)EAR), 0);
+            data.notifyDataChanged();
+
+            chart.notifyDataSetChanged();
+            chart.setVisibleXRangeMinimum(10);
+            chart.moveViewToX(data.getEntryCount());
+        }
+    }
+
+    public LineDataSet createSet(LineChart chart){
+
+        LineDataSet set = new LineDataSet(null, "Dynamic Data");
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColor(ColorTemplate.getHoloBlue());
+        set.setCircleColor(Color.WHITE);
+        set.setLineWidth(2f);
+        set.setCircleRadius(4f);
+        set.setFillAlpha(65);
+        set.setFillColor(ColorTemplate.getHoloBlue());
+        set.setHighLightColor(Color.rgb(244,117,117));
+        set.setDrawValues(false);
+        return set;
     }
 
     /**

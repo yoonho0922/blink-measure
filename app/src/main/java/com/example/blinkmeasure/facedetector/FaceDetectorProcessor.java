@@ -21,6 +21,7 @@ import android.graphics.PointF;
 import android.util.Log;
 
 import com.example.blinkmeasure.blink.BlinkDetector;
+import com.github.mikephil.charting.charts.LineChart;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.example.blinkmeasure.GraphicOverlay;
@@ -46,6 +47,7 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
 
     private final FaceDetector detector;
     private BlinkDetector bd = new BlinkDetector();
+    public double EAR;
 
     public FaceDetectorProcessor(Context context) {
         this(
@@ -79,8 +81,9 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
             graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
             List<PointF> LEpoints = face.getContour(FaceContour.LEFT_EYE).getPoints();
             List<PointF> REpoints = face.getContour(FaceContour.RIGHT_EYE).getPoints();
-            double EAR = (getEAR(LEpoints) + getEAR(REpoints))/2;
+            EAR = (getEAR(LEpoints) + getEAR(REpoints))/2;
             bd.detect(EAR);
+
         }
     }
 

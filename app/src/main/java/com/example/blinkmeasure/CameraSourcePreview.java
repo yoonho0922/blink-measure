@@ -24,6 +24,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.google.android.gms.common.images.Size;
 import com.example.blinkmeasure.preference.PreferenceUtils;
 
@@ -40,6 +41,7 @@ public class CameraSourcePreview extends ViewGroup {
     private boolean startRequested;
     private boolean surfaceAvailable;
     private CameraSource cameraSource;
+    public LineChart chart;
 
     private GraphicOverlay overlay;
 
@@ -62,14 +64,17 @@ public class CameraSourcePreview extends ViewGroup {
         this.cameraSource = cameraSource;
 
         if (this.cameraSource != null) {
+            Log.d(TAG, "onResume3.1");
             startRequested = true;
             startIfReady();
         }
     }
 
-    public void start(CameraSource cameraSource, GraphicOverlay overlay) throws IOException {
+    public void start(CameraSource cameraSource, GraphicOverlay overlay, LineChart chart) throws IOException {
         this.overlay = overlay;
+        this.chart = chart;
         start(cameraSource);
+        Log.d(TAG, "onResume3");
     }
 
     public void stop() {
@@ -87,11 +92,12 @@ public class CameraSourcePreview extends ViewGroup {
     }
 
     private void startIfReady() throws IOException, SecurityException {
+        Log.d(TAG, "onResume3.2");
         if (startRequested && surfaceAvailable) {
             if (PreferenceUtils.isCameraLiveViewportEnabled(context)) {
                 cameraSource.start(surfaceView.getHolder());
             } else {
-                cameraSource.start();
+                cameraSource.start(chart, 0);
             }
             requestLayout();
 
