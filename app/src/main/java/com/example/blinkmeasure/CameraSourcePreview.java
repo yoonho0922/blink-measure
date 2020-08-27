@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.google.android.gms.common.images.Size;
@@ -42,6 +43,7 @@ public class CameraSourcePreview extends ViewGroup {
     private boolean surfaceAvailable;
     private CameraSource cameraSource;
     public LineChart chart;
+    private TextView[] textView = new TextView[3];
 
     private GraphicOverlay overlay;
 
@@ -70,9 +72,10 @@ public class CameraSourcePreview extends ViewGroup {
         }
     }
 
-    public void start(CameraSource cameraSource, GraphicOverlay overlay, LineChart chart) throws IOException {
+    public void start(CameraSource cameraSource, GraphicOverlay overlay, LineChart chart, TextView[] textView) throws IOException {
         this.overlay = overlay;
         this.chart = chart;
+        this.textView = textView;
         start(cameraSource);
         Log.d(TAG, "onResume3");
     }
@@ -97,7 +100,7 @@ public class CameraSourcePreview extends ViewGroup {
             if (PreferenceUtils.isCameraLiveViewportEnabled(context)) {
                 cameraSource.start(surfaceView.getHolder());
             } else {
-                cameraSource.start(chart, 0);
+                cameraSource.start(chart, textView);
             }
             requestLayout();
 

@@ -38,6 +38,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -77,7 +78,7 @@ public final class MainActivity extends AppCompatActivity {
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
     private LineChart chart;
-    private Thread thread;
+    private TextView[] textView = new TextView[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,9 @@ public final class MainActivity extends AppCompatActivity {
         preview = findViewById(R.id.preview);
         graphicOverlay = findViewById(R.id.graphic_overlay);
         chart = findViewById(R.id.lineChart);
+        textView[0] = findViewById(R.id.blinkNum);
+        textView[1] = findViewById(R.id.blinPerMinute);
+        textView[2] = findViewById(R.id.EARvalue);
 
         if (allPermissionsGranted()) {
             Log.d(TAG, "createCameraSource, pg: " + allPermissionsGranted());
@@ -132,7 +136,7 @@ public final class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "resume: graphOverlay is null");
                 }
                 Log.d(TAG, "onResume2");
-                preview.start(cameraSource, graphicOverlay, chart);
+                preview.start(cameraSource, graphicOverlay, chart, textView);
                 Log.d(TAG, "onResume4");
             } catch (IOException e) {
                 Log.e(TAG, "Unable to start camera source.", e);
@@ -149,94 +153,6 @@ public final class MainActivity extends AppCompatActivity {
         createCameraSource(FACE_DETECTION);
         startCameraSource();
     }
-
-    // about chart
-
-//    private void setChart() {
-//
-//
-//
-//
-//        XAxis xAxis = chart.getXAxis();
-//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-//        xAxis.setTextSize(10f);
-//        xAxis.setDrawGridLines(false);
-//
-//        YAxis leftAxis = chart.getAxisLeft();
-//        leftAxis.setDrawGridLines(false);
-//
-//        YAxis rightAxis = chart.getAxisRight();
-//        rightAxis.setEnabled(false);
-//
-//        LineData data = new LineData();
-//        chart.setData(data);
-//
-//        feedMultiple();
-//    }
-//
-//    private void feedMultiple(){
-//        if(thread != null)
-//            thread.interrupt();
-//
-//        final Runnable runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                addEntry();
-//            }
-//        };
-//
-//        thread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while(true){
-//                    runOnUiThread(runnable);
-//                    try{
-//                        Thread.sleep(100);
-//                    }catch(InterruptedException ie){
-//                        ie.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-//        thread.start();
-//    }
-//
-//    private void addEntry(){
-//        LineData data = chart.getData();
-//        if(data != null){
-//            ILineDataSet set = data.getDataSetByIndex(0);
-//
-//            if(set == null){
-//                set = createSet();
-//                data.addDataSet(set);
-//            }
-//
-//            data.addEntry(new Entry(set.getEntryCount(), (float)(Math.random()*40)+30f), 0);
-//            data.notifyDataChanged();
-//
-//            chart.notifyDataSetChanged();
-//            chart.setVisibleXRangeMinimum(10);
-//            chart.moveViewToX(data.getEntryCount());
-//        }
-//    }
-//
-//    private LineDataSet createSet(){
-//
-//        LineDataSet set = new LineDataSet(null, "Dynamic Data");
-//        set.setAxisDependency(YAxis.AxisDependency.LEFT);
-//        set.setColor(ColorTemplate.getHoloBlue());
-//        set.setCircleColor(Color.WHITE);
-//        set.setLineWidth(2f);
-//        set.setCircleRadius(4f);
-//        set.setFillAlpha(65);
-//        set.setFillColor(ColorTemplate.getHoloBlue());
-//        set.setHighLightColor(Color.rgb(244,117,117));
-//        set.setDrawValues(false);
-//        return set;
-//    }
-//
-
-    // about permission granted
 
     private String[] getRequiredPermissions() {
         try {

@@ -11,7 +11,7 @@ public class BlinkDetector {
     private static int EAR_CONSEC_FRAMES = 1;
 
     private int counter;
-    private int blinkNumber;
+    public int blinkNumber;
 
     public BlinkDetector(){
         counter = 0;

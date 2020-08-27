@@ -11,7 +11,7 @@
     <com.example.blinkmeasure.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="1dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true">
 
@@ -23,6 +23,42 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"/>
     </com.example.blinkmeasure.CameraSourcePreview>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:orientation="vertical"
+        android:background="#000000">
+
+        <TextView
+            android:id="@+id/blinkNum"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Blink : 0"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/blinPerMinute"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Blink per minute : 0"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="25dp" />
+
+        <TextView
+            android:id="@+id/EARvalue"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="EAR : 0"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="25dp" />
+
+
+    </LinearLayout>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"

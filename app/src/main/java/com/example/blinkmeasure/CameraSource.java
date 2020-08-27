@@ -29,7 +29,9 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+import android.widget.TextView;
 
+import com.example.blinkmeasure.blink.BlinkDetector;
 import com.example.blinkmeasure.facedetector.FaceDetectorProcessor;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -127,6 +129,9 @@ public class CameraSource extends AppCompatActivity {
     // @GuardedBy("processorLock")
     public FaceDetectorProcessor frameProcessor;
     public LineChart chart;
+    private TextView[] textView = new TextView[3];
+    private BlinkDetector bd = new BlinkDetector();
+
 
     /**
      * Map to convert between a byte array, received from the camera, and its associated byte buffer.
@@ -172,9 +177,10 @@ public class CameraSource extends AppCompatActivity {
      * @throws IOException if the camera's preview texture or display could not be initialized
      */
     @RequiresPermission(Manifest.permission.CAMERA)
-    public synchronized CameraSource start(LineChart chart, int i) throws IOException {
+    public synchronized CameraSource start(LineChart chart, TextView[] textView) throws IOException {
         this.chart = chart;
         setChart();
+        this.textView = textView;
         if (camera != null) {
             return this;
         }
@@ -736,7 +742,12 @@ public class CameraSource extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                addEntry(frameProcessor.EAR);
+                                double EAR = frameProcessor.EAR;
+                                addEntry(EAR);
+                                bd.detect(EAR);
+
+                                textView[0].setText("Blink : " + bd.blinkNumber);
+                                textView[2].setText("EAR : " + String.format("%.3f", EAR));
                             }
                         });
 
@@ -756,13 +767,6 @@ public class CameraSource extends AppCompatActivity {
                 }
             }
         }
-
-//        final Runnable runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                addEntry(chart, EAR);
-//            }
-//        };
     }
 
     public void setChart(){
@@ -787,6 +791,7 @@ public class CameraSource extends AppCompatActivity {
         if(data != null){
             ILineDataSet set = data.getDataSetByIndex(0);
 
+
             if(set == null){
                 set = createSet(chart);
                 data.addDataSet(set);
@@ -796,7 +801,8 @@ public class CameraSource extends AppCompatActivity {
             data.notifyDataChanged();
 
             chart.notifyDataSetChanged();
-            chart.setVisibleXRangeMinimum(10);
+            chart.setVisibleXRangeMinimum(100);
+            chart.setVisibleXRangeMaximum(100);
             chart.moveViewToX(data.getEntryCount());
         }
     }
@@ -806,9 +812,9 @@ public class CameraSource extends AppCompatActivity {
         LineDataSet set = new LineDataSet(null, "Dynamic Data");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(ColorTemplate.getHoloBlue());
-        set.setCircleColor(Color.WHITE);
+        set.setCircleColor(ColorTemplate.getHoloBlue());
         set.setLineWidth(2f);
-        set.setCircleRadius(4f);
+        set.setCircleRadius(1);
         set.setFillAlpha(65);
         set.setFillColor(ColorTemplate.getHoloBlue());
         set.setHighLightColor(Color.rgb(244,117,117));

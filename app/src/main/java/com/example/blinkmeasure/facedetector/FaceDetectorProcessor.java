@@ -46,7 +46,6 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
     private static final String TAG = "FaceDetectorProcessor";
 
     private final FaceDetector detector;
-    private BlinkDetector bd = new BlinkDetector();
     public double EAR;
 
     public FaceDetectorProcessor(Context context) {
@@ -82,8 +81,6 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
             List<PointF> LEpoints = face.getContour(FaceContour.LEFT_EYE).getPoints();
             List<PointF> REpoints = face.getContour(FaceContour.RIGHT_EYE).getPoints();
             EAR = (getEAR(LEpoints) + getEAR(REpoints))/2;
-            bd.detect(EAR);
-
         }
     }
 
