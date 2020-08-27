@@ -21,11 +21,10 @@ public class BlinkDetector {
     public int detect(double EAR) {
         Log.i("get_EAR", "" + EAR);
 
-        long now = System.currentTimeMillis();
-        Date mDate = new Date(now);
-        SimpleDateFormat simpleDate = new SimpleDateFormat("HH-mm-ss.SSS");
-        String getTime = simpleDate.format(mDate);
-        Log.i("detect_time", getTime);
+
+//        SimpleDateFormat simpleDate = new SimpleDateFormat("HH-mm-ss.SSS");
+//        String getTime = simpleDate.format(mDate);
+//        Log.i("detect_time", getTime);
 
         if(EAR < EAR_THRESH) {
             counter++;

@@ -43,7 +43,7 @@
             android:id="@+id/blinPerMinute"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="Blink per minute : 0"
+            android:text="Blink per minute : calculatig..."
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="25dp" />

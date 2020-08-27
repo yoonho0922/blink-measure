@@ -32,6 +32,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.example.blinkmeasure.blink.BlinkDetector;
+import com.example.blinkmeasure.blink.BlinkStatics;
 import com.example.blinkmeasure.facedetector.FaceDetectorProcessor;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -48,6 +49,7 @@ import java.io.IOException;
 import java.lang.Thread.State;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +132,8 @@ public class CameraSource extends AppCompatActivity {
     public FaceDetectorProcessor frameProcessor;
     public LineChart chart;
     private TextView[] textView = new TextView[3];
-    private BlinkDetector bd = new BlinkDetector();
+    private BlinkDetector blinkDetector = new BlinkDetector();
+    private BlinkStatics blinkStatics = new BlinkStatics();
 
 
     /**
@@ -744,10 +747,15 @@ public class CameraSource extends AppCompatActivity {
                             public void run() {
                                 double EAR = frameProcessor.EAR;
                                 addEntry(EAR);
-                                bd.detect(EAR);
+                                Date mDate = new Date(System.currentTimeMillis());
 
-                                textView[0].setText("Blink : " + bd.blinkNumber);
+                                blinkStatics.setData(blinkDetector.blinkNumber, mDate);
+                                blinkDetector.detect(EAR);
+
+                                textView[0].setText("Blink : " + blinkDetector.blinkNumber);
                                 textView[2].setText("EAR : " + String.format("%.3f", EAR));
+                                if(blinkStatics.nowBPU != -1)
+                                    textView[1].setText("Blink per minute : " + blinkStatics.nowBPU);
                             }
                         });
 
