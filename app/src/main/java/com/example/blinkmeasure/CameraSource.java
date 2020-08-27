@@ -131,9 +131,9 @@ public class CameraSource extends AppCompatActivity {
     // @GuardedBy("processorLock")
     public FaceDetectorProcessor frameProcessor;
     public LineChart chart;
-    private TextView[] textView = new TextView[3];
-    private BlinkDetector blinkDetector = new BlinkDetector();
-    private BlinkStatics blinkStatics = new BlinkStatics();
+    private TextView[] textView = new TextView[4];
+    private BlinkDetector blinkDetector;
+    private BlinkStatics blinkStatics;
 
 
     /**
@@ -184,6 +184,9 @@ public class CameraSource extends AppCompatActivity {
         this.chart = chart;
         setChart();
         this.textView = textView;
+
+        blinkDetector = new BlinkDetector();
+        blinkStatics = new BlinkStatics();
         if (camera != null) {
             return this;
         }
@@ -753,9 +756,16 @@ public class CameraSource extends AppCompatActivity {
                                 blinkDetector.detect(EAR);
 
                                 textView[0].setText("Blink : " + blinkDetector.blinkNumber);
-                                textView[2].setText("EAR : " + String.format("%.3f", EAR));
-                                if(blinkStatics.nowBPU != -1)
+                                textView[3].setText("EAR : " + String.format("%.3f", EAR));
+                                if(blinkStatics.nowBPU != -1) {
                                     textView[1].setText("Blink per minute : " + blinkStatics.nowBPU);
+                                    float speed = 60/blinkStatics.nowBPU;
+                                    if(speed >= 60){
+                                        textView[2].setText("Blink Speed : calculating...");
+                                    }else{
+                                        textView[2].setText("Blink Speed : " + String.format("%.1f", speed) + "sec");
+                                    }
+                                }
                             }
                         });
 

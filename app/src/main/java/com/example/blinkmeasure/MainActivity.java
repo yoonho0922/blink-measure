@@ -78,7 +78,7 @@ public final class MainActivity extends AppCompatActivity {
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
     private LineChart chart;
-    private TextView[] textView = new TextView[3];
+    private TextView[] textView = new TextView[4];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +90,9 @@ public final class MainActivity extends AppCompatActivity {
         graphicOverlay = findViewById(R.id.graphic_overlay);
         chart = findViewById(R.id.lineChart);
         textView[0] = findViewById(R.id.blinkNum);
-        textView[1] = findViewById(R.id.blinPerMinute);
-        textView[2] = findViewById(R.id.EARvalue);
+        textView[1] = findViewById(R.id.blinkPerUnit);
+        textView[2] = findViewById(R.id.blinkSpeed);
+        textView[3] = findViewById(R.id.EARvalue);
 
         if (allPermissionsGranted()) {
             Log.d(TAG, "createCameraSource, pg: " + allPermissionsGranted());
